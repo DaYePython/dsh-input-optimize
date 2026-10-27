@@ -18,6 +18,21 @@
 
 模型优先使用输入框当前选择（含 reasoning effort）；没有选择时回退到当前 Agent 的模型。
 
+## 推荐安装方式
+
+需要 DSH 桌面端或 `dsh` CLI。一条命令即可从 GitHub 安装本插件：
+
+```sh
+dsh plugin --profile web add github:DaYePython/dsh-input-optimize
+```
+
+`dsh plugin` 会把包装进该 profile，并自动识别包里的 `dsh.bundle` 元数据、把 `dsh-input-optimize`
+追加到 `dsh.profile.bundles`；本仓库的 `cordis.patch.yml` 随之作为 bundle 层生效，**不需要手写 insert**。
+
+- `dsh` 没有加入 PATH 时，用桌面端自带 CLI 的绝对路径执行（见下文「安装」）。
+- 装完重启 `dsh web`（或对应 profile 的应用），再**刷新页面**。
+- 升级命令、手动写 profile 等细节见下文「安装」。
+
 ## 实现
 
 | 部分 | 位置 | 说明 |
@@ -111,6 +126,22 @@ dsh plugin --profile web add github:DaYePython/dsh-input-optimize
    ```
 
 4. 启动应用并**刷新页面**。
+
+## 卸载插件
+
+不再需要本插件时，用 `dsh plugin` 把它从 profile 中移除：
+
+```sh
+dsh plugin --profile web remove dsh-input-optimize
+```
+
+该命令在 profile 目录里执行 pnpm 移除依赖，并把 `dsh-input-optimize` 从 `dsh.profile.bundles`
+的有序层列表里移除，无需手动改 profile 文件。完成后重启 `dsh web`（或对应 profile 的应用）
+并刷新页面，输入框工具行里的优化按钮即不再出现。
+
+- 桌面端 `desktop` profile 由应用独占管理：在 DSH **设置 → 插件** 页禁用或卸载同一个插件即可。
+- 手动安装（方式二）的情况：删掉 profile `package.json` 里的 `dsh-input-optimize` 依赖行，以及
+  `cordis.patch.yml` 里对应的 `insert` 条目，再在 profile 目录重跑 `pnpm install`。
 
 ## 开发
 
