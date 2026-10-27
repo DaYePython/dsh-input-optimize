@@ -1,0 +1,9 @@
+# dsh-input-optimize bundle patch: inserts the plugin row over the profile root.
+#
+# 插件同时提供 Host 半（RPC 通道 /input-optimize）与浏览器半
+# （占用 conversation.input.right 槽位，渲染一个纯图标按钮）。
+# Host 半注入 connection + llm；浏览器半由 package.json 的 dsh.client 声明发现。
+
+- insert:
+    - id: input-optimize
+      name: dsh-input-optimize
