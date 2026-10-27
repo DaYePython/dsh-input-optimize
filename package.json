@@ -2,6 +2,15 @@
   "name": "dsh-input-optimize",
   "version": "0.1.2",
   "description": "输入框提示词优化按钮：一键调用当前选中模型优化用户提示词，保留引用 chip，失败原因走 tooltip",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DaYePython/dsh-input-optimize.git"
+  },
+  "homepage": "https://github.com/DaYePython/dsh-input-optimize#readme",
+  "bugs": {
+    "url": "https://github.com/DaYePython/dsh-input-optimize/issues"
+  },
+  "author": "DaYePython",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -18,7 +27,7 @@
     "client",
     "cordis.patch.yml",
     "README.md",
-    "README.zh.md"
+    "LICENSE"
   ],
   "scripts": {
     "test": "node --test test/*.test.mjs",
