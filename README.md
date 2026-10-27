@@ -52,15 +52,40 @@ Host 用 `ctx.llm.stream(...)` 调当前模型，聚合 `text-delta` 后返回 `
 
 ## 安装
 
-> 需要 DSH 桌面端（desktop profile）。安装前请**完全退出 DSH 桌面应用**。
+> 需要 DSH 桌面端或 `dsh` CLI。手动改 profile 时请先**完全退出 DSH 桌面应用**。
 
-### 方式一：从 GitHub 安装（推荐）
+### 方式一：DSH 推荐（一条命令）
+
+```sh
+dsh plugin --profile web add github:DaYePython/dsh-input-optimize
+```
+
+`dsh plugin` 会在 profile 目录里用 pnpm 安装依赖，并自动识别包的 `dsh.bundle` 元数据、把
+`dsh-input-optimize` 追加到 `dsh.profile.bundles`；本仓库的 `cordis.patch.yml`（`dsh.bundle.patch`）
+随之作为 bundle 层生效，**不需要手写 insert**。
+
+- `dsh` 随桌面端提供；没有加入 PATH 时可直接用绝对路径：
+
+  ```sh
+  "/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh" \
+    plugin --profile web add github:DaYePython/dsh-input-optimize
+  ```
+
+- 桌面端的 `desktop` profile 由应用独占管理：在 DSH **设置 → 插件** 页安装/启用同一个 GitHub 源即可，
+  或退出应用后用应用自带 CLI 执行 `dsh plugin --profile desktop ...`。
+- 升级：重复执行同一条命令（或 `dsh plugin --profile web update dsh-input-optimize`）。
+- 卸载：`dsh plugin --profile web remove dsh-input-optimize`。
+- 装完重启 `dsh web`（或对应 profile 的应用）并**刷新页面**——客户端 bundle 由 `/plugins` 按文件 mtime 发版。
+
+### 方式二：手动写 profile（适合本地调试 / 固定版本）
 
 1. 在 profile 的 `package.json` dependencies 里加一行（macOS 默认路径 `~/.dsh/profiles/desktop/package.json`）：
 
    ```json
    "dsh-input-optimize": "github:DaYePython/dsh-input-optimize"
    ```
+
+   本地源码调试可改用目录路径：`"dsh-input-optimize": "file:/path/to/dsh-input-optimize"`。
 
 2. 在 profile 目录安装依赖：
 
@@ -77,7 +102,7 @@ Host 用 `ctx.llm.stream(...)` 调当前模型，聚合 `text-delta` 后返回 `
    "$NODE" "$PNPM" install
    ```
 
-3. 在 profile 的 `cordis.patch.yml` 追加加载行：
+3. 在 profile 的 `cordis.patch.yml` 追加加载行（手动写依赖时必需）：
 
    ```yaml
    - insert:
@@ -85,17 +110,7 @@ Host 用 `ctx.llm.stream(...)` 调当前模型，聚合 `text-delta` 后返回 `
          name: dsh-input-optimize
    ```
 
-4. 启动应用并**刷新页面**——客户端 bundle 由 `/plugins` 按文件 mtime 发版，不刷新不会加载新的客户端代码。
-
-> 本仓库自带 `cordis.patch.yml`（`dsh.bundle.patch`）。如果把整个包作为 bundle 放进 profile 的 `dsh.profile.bundles`，插入行会自动生效，无需手写上面的 `insert`。
-
-### 方式二：从本地源码安装
-
-把依赖改成目录路径，其余步骤相同：
-
-```json
-"dsh-input-optimize": "file:/path/to/dsh-input-optimize"
-```
+4. 启动应用并**刷新页面**。
 
 ## 开发
 
@@ -127,6 +142,7 @@ cp client/client.js ~/.dsh/profiles/desktop/node_modules/dsh-input-optimize/clie
 | 现象 | 排查方向 |
 | --- | --- |
 | 输入框里看不到按钮 | 确认草稿非空；确认插件已加载（Host 日志里有 `input-optimize: host half ACTIVATED`）；刷新页面。 |
+| `dsh: command not found` | 用桌面端自带 CLI 的绝对路径执行，或改用手动写 profile 的方式二。 |
 | 点击后提示「宿主未提供 RPC 通道」 | DSH 版本过旧或客户端没有暴露 `connection.rpc`，检查 DSH 版本。 |
 | 改了代码页面没变化 | 客户端 bundle 是 profile 里的副本：先同步 `client/client.js`（或重跑 `pnpm install`），再刷新页面。 |
 | 优化一直失败 | 检查当前选中模型是否可用、网络是否正常；具体原因在按钮 tooltip 里。 |
